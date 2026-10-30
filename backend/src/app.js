@@ -31,14 +31,18 @@ function createApp(options = {}) {
   app.use('/api/rides', rideRoutes);
   app.use('/api/admin', adminRoutes);
 
-  // Painel administrativo (DASHBOARD), servido em /dashboard.
-  app.use(
-    '/dashboard',
-    express.static(path.join(__dirname, '..', '..', 'DASHBOARD')),
-  );
+  // Cada modulo e servido na sua propria rota, com o mesmo backend da API.
+  // COMPARTILHADO guarda os assets comuns (api.js, ui.js, shell.js, app.css).
+  const root = path.join(__dirname, '..', '..');
+  app.use('/compartilhado', express.static(path.join(root, 'COMPARTILHADO')));
+  app.use('/passageiro', express.static(path.join(root, 'PASSAGEIRO')));
+  app.use('/motorista', express.static(path.join(root, 'MOTORISTA')));
+  app.use('/dashboard', express.static(path.join(root, 'DASHBOARD')));
 
-  // Serve o PWA (passageiro e motorista) na mesma origem da API.
-  app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
+  // Portal: pagina inicial que leva aos tres modulos.
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(root, 'COMPARTILHADO', 'index.html'));
+  });
 
   app.use((req, res) => res.status(404).json({ error: 'Rota não encontrada' }));
 

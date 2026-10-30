@@ -226,3 +226,26 @@ footer {
 .badge-in_progress { background: #dcfce7; color: #166534; }
 .badge-completed { background: #e5e7eb; color: #374151; }
 .badge-canceled { background: #fee2e2; color: #991b1b; }
+
+/* --- Portal: cartoes que levam aos modulos --- */
+.portal-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.portal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.portal-card h2 {
+  margin-bottom: 0.35rem;
+}
+
+.portal-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}

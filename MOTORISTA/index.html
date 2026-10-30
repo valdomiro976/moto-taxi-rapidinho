@@ -4,20 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f5a623" />
-    <title>MOTO-TAXI RAPIDINHO</title>
+    <title>Motorista · MOTO-TAXI RAPIDINHO</title>
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/compartilhado/css/app.css" />
   </head>
   <body>
     <header class="topbar">
       <h1>MOTO&#8209;TAXI <span>RAPIDINHO</span></h1>
-      <p class="tagline">Sua corrida de moto, rapidinho.</p>
+      <p class="tagline">Área do motorista — aceite corridas e ganhe.</p>
     </header>
 
     <main>
-      <!-- Autenticacao: entrada comum aos dois modulos -->
       <section id="auth" class="card hidden">
-        <h2>Acesso</h2>
+        <h2>Acesso do motorista</h2>
         <form id="auth-form" autocomplete="on">
           <label>
             Nome
@@ -31,13 +30,6 @@
             Senha
             <input type="password" name="password" placeholder="minimo 6 caracteres" required />
           </label>
-          <label>
-            Entrar como
-            <select name="role">
-              <option value="passenger">Passageiro</option>
-              <option value="driver">Motorista</option>
-            </select>
-          </label>
           <div class="actions">
             <button type="submit" data-action="login">Entrar</button>
             <button type="button" data-action="register" class="secondary">Cadastrar</button>
@@ -46,7 +38,6 @@
         <p id="auth-status" class="status" role="status"></p>
       </section>
 
-      <!-- Area autenticada: o modulo e escolhido pelo papel do usuario -->
       <section id="workspace" class="hidden">
         <div class="card session-bar">
           <span id="current-user"></span>
@@ -57,13 +48,20 @@
     </main>
 
     <footer>
-      <small>MOTO-TAXI RAPIDINHO &middot; prototipo</small>
+      <small>MOTO-TAXI RAPIDINHO &middot; motorista</small>
     </footer>
 
-    <script src="js/api.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/passenger.js"></script>
-    <script src="js/driver.js"></script>
-    <script src="js/shell.js"></script>
+    <script src="/compartilhado/js/api.js"></script>
+    <script src="/compartilhado/js/ui.js"></script>
+    <script src="js/motorista.js"></script>
+    <script src="/compartilhado/js/shell.js"></script>
+    <script>
+      // Prefixo proprio: a sessao do motorista nao colide com a do passageiro.
+      startApp({
+        api: createApi('motoTaxiDriver'),
+        module: DriverModule,
+        role: 'driver',
+      });
+    </script>
   </body>
 </html>

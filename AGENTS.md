@@ -5,7 +5,7 @@ Memória persistente do repositório para agentes (OpenHands) e pessoas.
 ## Visão geral
 
 Aplicação de moto-táxi com dois perfis de usuário: **passageiro** e **motoboy**.
-Backend em Node.js/Express com SQLite; frontend web (PWA) em HTML/CSS/JS puro
+Backend em Node.js/Express com SQLite; apps web (PWA) em HTML/CSS/JS puro
 (sem framework, para facilitar a evolução e o deploy).
 
 ## Comandos
@@ -32,25 +32,34 @@ npm run dev       # modo watch (node --watch)
 
 ```
 backend/src/
-├── app.js           # cria o app Express (sem escutar porta) + serve frontend e DASHBOARD
+├── app.js           # cria o app Express (sem escutar porta) + serve os 3 módulos
 ├── server.js        # sobe o servidor
 ├── db.js            # conexão e migrações do SQLite
 ├── middleware/      # autenticação, papéis
 └── routes/          # health, auth, rides, admin
 backend/scripts/     # create-admin.js (concede o papel admin)
-frontend/
-├── index.html       # casca (login + área autenticada)
-├── styles.css
+COMPARTILHADO/       # assets comuns aos dois apps (servidos em /compartilhado)
+├── index.html       # portal com um cartão por módulo
+├── css/app.css
 └── js/
-    ├── api.js       # cliente HTTP + sessão
+    ├── api.js       # fábrica do cliente HTTP + sessão
     ├── ui.js        # formatação e cartões de corrida
-    ├── passenger.js # MÓDULO PASSAGEIRO
-    ├── driver.js    # MÓDULO MOTORISTA
-    └── shell.js     # login e troca de módulo
+    └── shell.js     # login e montagem do módulo
+PASSAGEIRO/          # app do passageiro (servido em /passageiro)
+├── index.html
+└── js/passageiro.js # MÓDULO PASSAGEIRO
+MOTORISTA/           # app do motorista (servido em /motorista)
+├── index.html
+└── js/motorista.js  # MÓDULO MOTORISTA
 DASHBOARD/           # painel administrativo (servido em /dashboard)
 docs/                # arquitetura e modelo de dados
 scripts/             # instalação no Windows e no Linux
 ```
+
+Cada app tem seu próprio HTML e sua própria chave de sessão no `localStorage`
+(`motoTaxiPassenger*` e `motoTaxiDriver*`). Como os dois rodam na mesma origem,
+chaves iguais fariam a sessão de um vazar para o outro. O `createApi(prefixo)`
+de `COMPARTILHADO/js/api.js` recebe esse prefixo.
 
 ## Módulos e autorização
 

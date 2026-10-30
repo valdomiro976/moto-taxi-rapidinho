@@ -6,7 +6,7 @@ const PassengerModule = (() => {
 
   function template(user) {
     return `
-      <h2>Passageiro — <span>${user.name}</span></h2>
+      <h2>Passageiro — <span>${UI.escapeHtml(user.name)}</span></h2>
       <form id="passenger-ride-form">
         <label>
           Origem
@@ -31,13 +31,13 @@ const PassengerModule = (() => {
     `;
   }
 
-  function mount(root) {
+  function mount(root, api) {
     const statusEl = root.querySelector('#passenger-status');
     const listEl = root.querySelector('#passenger-ride-list');
 
     async function load() {
       try {
-        const { rides } = await MotoTaxi.request('/rides/mine');
+        const { rides } = await api.request('/rides/mine');
         listEl.innerHTML = rides.length
           ? rides.map((r) => UI.rideCard(r, cancelButton(r))).join('')
           : '<li>Você ainda não pediu nenhuma corrida.</li>';
@@ -56,7 +56,7 @@ const PassengerModule = (() => {
       e.preventDefault();
       const form = e.target;
       try {
-        await MotoTaxi.request('/rides', {
+        await api.request('/rides', {
           method: 'POST',
           body: {
             origin: form.origin.value.trim(),
@@ -79,7 +79,7 @@ const PassengerModule = (() => {
       const id = e.target.getAttribute('data-cancel');
       if (!id) return;
       try {
-        await MotoTaxi.request(`/rides/${id}/status`, {
+        await api.request(`/rides/${id}/status`, {
           method: 'PATCH',
           body: { status: 'canceled' },
         });

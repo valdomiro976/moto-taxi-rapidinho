@@ -1,15 +1,9 @@
 'use strict';
 
-// Casca da aplicacao: autenticacao e troca entre os modulos.
-const App = (() => {
-  const MODULES = {
-    passenger: PassengerModule,
-    driver: DriverModule,
-  };
-
-  function $(sel) {
-    return document.querySelector(sel);
-  }
+// Casca compartilhada pelos apps Passageiro e Motorista: login, sessao e
+// montagem do modulo. Cada app passa seu proprio cliente de API e papel.
+function startApp({ api, module, role }) {
+  const $ = (sel) => document.querySelector(sel);
 
   function showAuth() {
     $('#auth').classList.remove('hidden');
@@ -17,18 +11,17 @@ const App = (() => {
   }
 
   function showWorkspace() {
-    const user = MotoTaxi.state.user;
+    const user = api.state.user;
     $('#auth').classList.add('hidden');
     $('#workspace').classList.remove('hidden');
-    $('#current-user').textContent = `${user.name} · ${MODULES[user.role].title}`;
-    mountModule(user.role);
+    $('#current-user').textContent = `${user.name} · ${module.title}`;
+    mountModule();
   }
 
-  function mountModule(role) {
-    const module = MODULES[role];
+  function mountModule() {
     const container = $('#module-container');
-    container.innerHTML = module.template(MotoTaxi.state.user);
-    module.mount(container);
+    container.innerHTML = module.template(api.state.user);
+    module.mount(container, api);
   }
 
   async function handleAuth(action) {
@@ -38,14 +31,14 @@ const App = (() => {
       name: form.name.value.trim(),
       email: form.email.value.trim(),
       password: form.password.value,
-      role: form.role.value,
+      role,
     };
 
     try {
       const data = action === 'register'
-        ? await MotoTaxi.register(payload)
-        : await MotoTaxi.signIn({ email: payload.email, password: payload.password });
-      MotoTaxi.login(data.user, data.token);
+        ? await api.register(payload)
+        : await api.signIn({ email: payload.email, password: payload.password });
+      api.login(data.user, data.token);
       UI.setStatus(statusEl, '');
       showWorkspace();
     } catch (err) {
@@ -60,15 +53,13 @@ const App = (() => {
     });
     $('#auth-form [data-action="register"]').addEventListener('click', () => handleAuth('register'));
     $('#logout').addEventListener('click', () => {
-      MotoTaxi.logout();
+      api.logout();
       showAuth();
     });
 
-    if (MotoTaxi.isLoggedIn()) showWorkspace();
+    if (api.isLoggedIn()) showWorkspace();
     else showAuth();
   }
 
-  return { init };
-})();
-
-document.addEventListener('DOMContentLoaded', App.init);
+  document.addEventListener('DOMContentLoaded', init);
+}

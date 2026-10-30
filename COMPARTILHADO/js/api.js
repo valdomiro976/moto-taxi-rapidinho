@@ -1,12 +1,16 @@
 'use strict';
 
-// Cliente da API e sessao compartilhada entre os modulos Passageiro e Motorista.
-const MotoTaxi = (() => {
+// Fabrica do cliente da API, compartilhada pelos apps Passageiro e Motorista.
+// Cada app usa um prefixo proprio de armazenamento: como os dois rodam na mesma
+// origem, chaves iguais fariam a sessao de um vazar para o outro.
+function createApi(storagePrefix) {
   const API_BASE = window.MOTO_TAXI_API || '/api';
+  const TOKEN_KEY = `${storagePrefix}Token`;
+  const USER_KEY = `${storagePrefix}User`;
 
   const state = {
-    token: localStorage.getItem('motoTaxiToken') || null,
-    user: JSON.parse(localStorage.getItem('motoTaxiUser') || 'null'),
+    token: localStorage.getItem(TOKEN_KEY) || null,
+    user: JSON.parse(localStorage.getItem(USER_KEY) || 'null'),
   };
 
   async function request(path, { method = 'GET', body } = {}) {
@@ -26,15 +30,15 @@ const MotoTaxi = (() => {
   function login(user, token) {
     state.user = user;
     state.token = token;
-    localStorage.setItem('motoTaxiUser', JSON.stringify(user));
-    localStorage.setItem('motoTaxiToken', token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    localStorage.setItem(TOKEN_KEY, token);
   }
 
   function logout() {
     state.user = null;
     state.token = null;
-    localStorage.removeItem('motoTaxiUser');
-    localStorage.removeItem('motoTaxiToken');
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
   }
 
   function isLoggedIn() {
@@ -50,4 +54,4 @@ const MotoTaxi = (() => {
     register: (payload) => request('/auth/register', { method: 'POST', body: payload }),
     signIn: (payload) => request('/auth/login', { method: 'POST', body: payload }),
   };
-})();
+}

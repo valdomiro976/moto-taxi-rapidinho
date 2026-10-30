@@ -6,7 +6,7 @@ const DriverModule = (() => {
 
   function template(user) {
     return `
-      <h2>Motorista — <span>${user.name}</span></h2>
+      <h2>Motorista — <span>${UI.escapeHtml(user.name)}</span></h2>
       <div class="actions">
         <button type="button" id="driver-refresh">Atualizar corridas disponíveis</button>
       </div>
@@ -34,7 +34,7 @@ const DriverModule = (() => {
     return '';
   }
 
-  function mount(root) {
+  function mount(root, api) {
     const statusEl = root.querySelector('#driver-status');
     const availableEl = root.querySelector('#driver-available-list');
     const mineEl = root.querySelector('#driver-mine-list');
@@ -42,8 +42,8 @@ const DriverModule = (() => {
     async function load() {
       try {
         const [available, mine] = await Promise.all([
-          MotoTaxi.request('/rides/available'),
-          MotoTaxi.request('/rides/mine'),
+          api.request('/rides/available'),
+          api.request('/rides/mine'),
         ]);
         availableEl.innerHTML = available.rides.length
           ? available.rides.map((r) => UI.rideCard(r, acceptButton(r))).join('')
@@ -58,7 +58,7 @@ const DriverModule = (() => {
 
     async function changeStatus(id, status, successMessage) {
       try {
-        await MotoTaxi.request(`/rides/${id}/status`, { method: 'PATCH', body: { status } });
+        await api.request(`/rides/${id}/status`, { method: 'PATCH', body: { status } });
         UI.setStatus(statusEl, successMessage, 'ok');
         load();
       } catch (err) {

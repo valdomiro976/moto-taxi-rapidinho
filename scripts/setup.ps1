@@ -157,7 +157,9 @@ Write-Host "  cd `"$backend`""
 Write-Host "  npm start"
 Write-Host ""
 Write-Host "Depois abra:" -ForegroundColor Yellow
-Write-Host "  http://localhost:3000             (app: passageiro e motorista)"
+Write-Host "  http://localhost:3000             (portal: escolhe o modulo)"
+Write-Host "  http://localhost:3000/passageiro  (app do passageiro)"
+Write-Host "  http://localhost:3000/motorista   (app do motorista)"
 Write-Host "  http://localhost:3000/dashboard   (painel administrativo)"
 Write-Host ""
 Write-Host "Entre no painel com: $AdminEmail" -ForegroundColor Yellow

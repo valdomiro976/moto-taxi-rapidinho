@@ -1,6 +1,6 @@
 'use strict';
 
-// Utilitarios compartilhados: renderizacao de status, dinheiro e mensagens.
+// Utilitarios de interface compartilhados: status, dinheiro e cartoes de corrida.
 const UI = (() => {
   const STATUS_LABELS = {
     requested: 'Aguardando motoboy',
@@ -9,6 +9,13 @@ const UI = (() => {
     completed: 'Concluída',
     canceled: 'Cancelada',
   };
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(
+      /[&<>"']/g,
+      (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
+    );
+  }
 
   function money(cents) {
     return `R$ ${(cents / 100).toFixed(2).replace('.', ',')}`;
@@ -35,12 +42,12 @@ const UI = (() => {
           <strong>Corrida #${ride.id}</strong>
           ${badge(ride.status)}
         </div>
-        <p class="ride-route">${ride.origin} → ${ride.destination}</p>
+        <p class="ride-route">${escapeHtml(ride.origin)} → ${escapeHtml(ride.destination)}</p>
         <p class="ride-price">${money(ride.priceCents)}</p>
         ${actionsHtml}
       </li>
     `;
   }
 
-  return { money, statusLabel, badge, setStatus, rideCard };
+  return { escapeHtml, money, statusLabel, badge, setStatus, rideCard };
 })();

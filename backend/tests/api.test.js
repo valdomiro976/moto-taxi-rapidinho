@@ -209,7 +209,7 @@ test('transicao invalida retorna 409 e sem token retorna 401', async (t) => {
   assert.equal(noAuth.status, 401);
 });
 
-test('PWA e servido na raiz', async (t) => {
+test('o portal e servido na raiz com os tres modulos', async (t) => {
   const { server, base } = await startServer();
   t.after(() => server.close());
 
@@ -217,5 +217,39 @@ test('PWA e servido na raiz', async (t) => {
   assert.equal(res.status, 200);
   const html = await res.text();
   assert.match(html, /MOTO/);
-  assert.match(html, /js\/shell\.js/);
+  assert.match(html, /href="\/passageiro\/"/);
+  assert.match(html, /href="\/motorista\/"/);
+  assert.match(html, /href="\/dashboard\/"/);
+});
+
+test('o app do passageiro e servido em /passageiro', async (t) => {
+  const { server, base } = await startServer();
+  t.after(() => server.close());
+
+  const res = await fetch(base + '/passageiro/');
+  assert.equal(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /Acesso do passageiro/);
+  assert.match(html, /js\/passageiro\.js/);
+});
+
+test('o app do motorista e servido em /motorista', async (t) => {
+  const { server, base } = await startServer();
+  t.after(() => server.close());
+
+  const res = await fetch(base + '/motorista/');
+  assert.equal(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /Acesso do motorista/);
+  assert.match(html, /js\/motorista\.js/);
+});
+
+test('os assets compartilhados sao servidos em /compartilhado', async (t) => {
+  const { server, base } = await startServer();
+  t.after(() => server.close());
+
+  for (const asset of ['js/api.js', 'js/ui.js', 'js/shell.js', 'css/app.css']) {
+    const res = await fetch(`${base}/compartilhado/${asset}`);
+    assert.equal(res.status, 200, `asset ausente: ${asset}`);
+  }
 });

@@ -25,14 +25,18 @@
 - **JWT** para autenticação; senhas derivadas com `scrypt`.
 - Separação `app.js` (aplicação) x `server.js` (processo) para testes.
 
-### Frontend (`frontend/`)
-- PWA em HTML/CSS/JS puro, sem build obrigatório.
-- **Dois módulos** carregados dinamicamente conforme `user.role`:
-  - `passenger.js` — pedir corrida, acompanhar, cancelar.
-  - `driver.js` — fila de pendentes, aceitar, iniciar, concluir.
-- `shell.js` faz o login e monta o módulo; `api.js` guarda a sessão (JWT em
-  `localStorage`); `ui.js` centraliza formatação.
-- Servido pelo próprio backend na raiz (`/`), evitando CORS.
+### Apps dos módulos (`PASSAGEIRO/`, `MOTORISTA/`)
+- PWAs em HTML/CSS/JS puro, sem build obrigatório, servidos pelo backend
+  em `/passageiro` e `/motorista` (mesma origem da API, sem CORS).
+- Cada um tem seu `index.html`, seu `manifest.webmanifest` e seu módulo:
+  - `PASSAGEIRO/js/passageiro.js` — pedir corrida, acompanhar, cancelar.
+  - `MOTORISTA/js/motorista.js` — fila de pendentes, aceitar, iniciar, concluir.
+- A casca é comum (`COMPARTILHADO/js/shell.js`): login, sessão e montagem do
+  módulo. Cada app cria seu cliente de API com um prefixo próprio
+  (`createApi('motoTaxiPassenger')` / `createApi('motoTaxiDriver')`), de modo
+  que as duas sessões não colidem no `localStorage`.
+- `COMPARTILHADO/js/ui.js` centraliza formatação e cartões de corrida;
+  `COMPARTILHADO/index.html` é o portal servido na raiz `/`.
 
 ### Painel administrativo (`DASHBOARD/`)
 - HTML/CSS/JS puro, servido pelo backend em `/dashboard` (mesma origem da API).
@@ -56,4 +60,3 @@
 - Mapa (Leaflet + OpenStreetMap) e cálculo de distância/rota.
 - Pagamento via Pix.
 - Notificações push.
-- Painel administrativo.

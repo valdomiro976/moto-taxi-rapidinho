@@ -14,15 +14,21 @@ MOTO-TAXI-RAPIDINHO/
 ├── backend/          API REST (Node.js + Express + SQLite)
 │   ├── src/routes/   health, auth, rides, admin
 │   └── scripts/      create-admin.js
-├── frontend/         PWA com dois módulos
-│   ├── index.html    casca (login + área autenticada)
-│   ├── styles.css
+├── COMPARTILHADO/    Assets comuns aos dois apps (servidos em /compartilhado)
+│   ├── index.html        portal: escolhe o módulo
+│   ├── css/app.css
 │   └── js/
-│       ├── api.js        cliente da API + sessão
+│       ├── api.js        fábrica do cliente da API + sessão
 │       ├── ui.js         formatação (dinheiro, status, cartões)
-│       ├── passenger.js  MÓDULO PASSAGEIRO
-│       ├── driver.js     MÓDULO MOTORISTA
-│       └── shell.js      login e troca de módulo
+│       └── shell.js      login e montagem do módulo
+├── PASSAGEIRO/       App do passageiro (servido em /passageiro)
+│   ├── index.html
+│   ├── manifest.webmanifest
+│   └── js/passageiro.js
+├── MOTORISTA/        App do motorista (servido em /motorista)
+│   ├── index.html
+│   ├── manifest.webmanifest
+│   └── js/motorista.js
 ├── DASHBOARD/        Painel administrativo (servido em /dashboard)
 │   ├── index.html
 │   ├── css/dashboard.css
@@ -34,15 +40,20 @@ MOTO-TAXI-RAPIDINHO/
 └── README.md
 ```
 
+Cada app é um PWA independente, com sua própria sessão no navegador. Os dois
+usam o mesmo backend e os mesmos assets de `COMPARTILHADO/`.
+
 ## Módulos
 
-O sistema tem **dois módulos**, escolhidos pelo papel (`role`) do usuário no
-cadastro:
+O sistema tem **dois módulos** de aplicativo, um para cada papel (`role`):
 
-| Módulo | Papel | O que faz |
-|--------|-------|-----------|
-| **Passageiro** | `passenger` | Pede corrida, acompanha o status e cancela |
-| **Motorista** | `driver` | Vê a fila de corridas pendentes, aceita, inicia e conclui |
+| Módulo | Pasta | Papel | Rota | O que faz |
+|--------|-------|-------|------|-----------|
+| **Passageiro** | `PASSAGEIRO/` | `passenger` | `/passageiro` | Pede corrida, acompanha o status e cancela |
+| **Motorista** | `MOTORISTA/` | `driver` | `/motorista` | Vê a fila de corridas pendentes, aceita, inicia e conclui |
+| **Dashboard** | `DASHBOARD/` | `admin` | `/dashboard` | Painel com usuários, corridas e indicadores |
+
+A raiz `/` é um portal com um cartão para cada módulo.
 
 O backend reforça as regras — não é só a tela que esconde botões:
 
@@ -63,12 +74,19 @@ O backend reforça as regras — não é só a tela que esconde botões:
 cd backend
 npm install
 npm test          # roda os testes automatizados
-npm start         # sobe a API + o PWA em http://localhost:3000
+npm start         # sobe a API + os apps em http://localhost:3000
 ```
 
-O backend serve o frontend na mesma origem, então basta abrir
-`http://localhost:3000` — não é preciso rodar um segundo servidor nem lidar
-com CORS.
+O backend serve os apps na mesma origem, então basta abrir:
+
+| URL | O que é |
+|-----|---------|
+| `http://localhost:3000` | Portal com os três módulos |
+| `http://localhost:3000/passageiro` | App do passageiro |
+| `http://localhost:3000/motorista` | App do motorista |
+| `http://localhost:3000/dashboard` | Painel administrativo |
+
+Não é preciso rodar um segundo servidor nem lidar com CORS.
 
 Endpoints:
 
