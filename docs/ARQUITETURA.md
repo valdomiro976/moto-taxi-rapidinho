@@ -27,8 +27,19 @@
 
 ### Frontend (`frontend/`)
 - PWA em HTML/CSS/JS puro, sem build obrigatório.
-- Telas: login/cadastro, pedido de corrida, acompanhamento.
-- Consome a API em `http://localhost:3000/api` (configurável).
+- **Dois módulos** carregados dinamicamente conforme `user.role`:
+  - `passenger.js` — pedir corrida, acompanhar, cancelar.
+  - `driver.js` — fila de pendentes, aceitar, iniciar, concluir.
+- `shell.js` faz o login e monta o módulo; `api.js` guarda a sessão (JWT em
+  `localStorage`); `ui.js` centraliza formatação.
+- Servido pelo próprio backend na raiz (`/`), evitando CORS.
+
+### Painel administrativo (`DASHBOARD/`)
+- HTML/CSS/JS puro, servido pelo backend em `/dashboard` (mesma origem da API).
+- `dashboard.js` cuida de login, navegação e tabelas; `js/api.js` guarda a sessão
+  do admin em `localStorage`.
+- Consome `/api/admin/stats`, `/api/admin/rides` e `/api/admin/users`.
+- Acesso restrito ao papel `admin`, validado no backend.
 
 ## Fluxo de uma corrida
 

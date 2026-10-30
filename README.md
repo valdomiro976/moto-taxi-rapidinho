@@ -12,13 +12,45 @@ Plataforma de moto-táxi: passageiro pede corrida, motoboy aceita, acompanhament
 ```
 MOTO-TAXI-RAPIDINHO/
 ├── backend/          API REST (Node.js + Express + SQLite)
-├── frontend/         Aplicação web (PWA) do passageiro e do motoboy
+│   ├── src/routes/   health, auth, rides, admin
+│   └── scripts/      create-admin.js
+├── frontend/         PWA com dois módulos
+│   ├── index.html    casca (login + área autenticada)
+│   ├── styles.css
+│   └── js/
+│       ├── api.js        cliente da API + sessão
+│       ├── ui.js         formatação (dinheiro, status, cartões)
+│       ├── passenger.js  MÓDULO PASSAGEIRO
+│       ├── driver.js     MÓDULO MOTORISTA
+│       └── shell.js      login e troca de módulo
+├── DASHBOARD/        Painel administrativo (servido em /dashboard)
+│   ├── index.html
+│   ├── css/dashboard.css
+│   └── js/{api.js,dashboard.js}
 ├── docs/             Documentação e modelo de dados
 ├── scripts/          Scripts de instalação (Windows / Linux)
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
+
+## Módulos
+
+O sistema tem **dois módulos**, escolhidos pelo papel (`role`) do usuário no
+cadastro:
+
+| Módulo | Papel | O que faz |
+|--------|-------|-----------|
+| **Passageiro** | `passenger` | Pede corrida, acompanha o status e cancela |
+| **Motorista** | `driver` | Vê a fila de corridas pendentes, aceita, inicia e conclui |
+
+O backend reforça as regras — não é só a tela que esconde botões:
+
+- `POST /api/rides` → apenas `passenger`
+- `GET /api/rides/available` → apenas `driver`
+- `PATCH /api/rides/:id/status` com `accepted` → apenas `driver`
+- `in_progress` / `completed` → apenas o `driver` dono da corrida
+- `canceled` → o `passenger` dono ou o `driver` dono
 
 ## Requisitos
 
@@ -31,34 +63,107 @@ MOTO-TAXI-RAPIDINHO/
 cd backend
 npm install
 npm test          # roda os testes automatizados
-npm start         # sobe a API em http://localhost:3000
+npm start         # sobe a API + o PWA em http://localhost:3000
 ```
 
-Endpoints iniciais:
+O backend serve o frontend na mesma origem, então basta abrir
+`http://localhost:3000` — não é preciso rodar um segundo servidor nem lidar
+com CORS.
 
-| Método | Rota                     | Descrição                              |
-|--------|--------------------------|----------------------------------------|
-| GET    | `/api/health`            | Verificação de saúde                   |
-| POST   | `/api/auth/register`     | Cadastro de passageiro                 |
-| POST   | `/api/auth/login`        | Login (retorna token JWT)              |
-| GET    | `/api/rides`             | Lista corridas                         |
-| POST   | `/api/rides`             | Cria uma corrida                       |
-| GET    | `/api/rides/:id`         | Detalhe da corrida                     |
-| PATCH  | `/api/rides/:id/status`  | Atualiza o status da corrida           |
+Endpoints:
+
+| Método | Rota                     | Papel       | Descrição                              |
+|--------|--------------------------|-------------|----------------------------------------|
+| GET    | `/api/health`            | público     | Verificação de saúde                   |
+| POST   | `/api/auth/register`     | público     | Cadastro (passageiro ou motorista)     |
+| POST   | `/api/auth/login`        | público     | Login (retorna token JWT)              |
+| GET    | `/api/rides`             | autenticado | Lista corridas                         |
+| GET    | `/api/rides/available`   | motorista   | Fila de corridas pendentes             |
+| GET    | `/api/rides/mine`        | autenticado | Corridas do próprio usuário            |
+| POST   | `/api/rides`             | passageiro  | Cria uma corrida                       |
+| GET    | `/api/rides/:id`         | autenticado | Detalhe da corrida                     |
+| PATCH  | `/api/rides/:id/status`  | por papel   | Atualiza o status (ver "Módulos")      |
+| GET    | `/api/admin/stats`       | admin       | Totais de usuários, corridas e receita |
+| GET    | `/api/admin/users`       | admin       | Lista usuários (`?role=`)              |
+| GET    | `/api/admin/rides`       | admin       | Lista corridas (`?status=`)            |
+
+## Painel administrativo (DASHBOARD)
+
+Painel web em `DASHBOARD/`, servido pelo backend em **`/dashboard`**. Mostra a
+visão geral (corridas, usuários e faturamento concluído), a lista de corridas
+com filtro por status e a lista de usuários com filtro por papel.
+
+O papel `admin` **não** pode ser escolhido no cadastro da API. Crie o primeiro
+administrador pelo script:
+
+```bash
+cd backend
+node scripts/create-admin.js --email admin@exemplo.com --password "senha-forte" --name "Seu Nome"
+```
+
+Depois abra `http://localhost:3000/dashboard` e entre com esse e-mail e senha.
+Rodar o script de novo com o mesmo e-mail apenas atualiza a senha.
 
 ## Como colocar em `H:\MOTO-TAXI-RAPIDINHO`
 
-### Opção A — clonar do GitHub (recomendado)
+> **Atenção:** rode os comandos **dentro da pasta do projeto**
+> (`H:\MOTO-TAXI-RAPIDINHO\backend`), nunca na raiz do disco (`H:\`). Se você
+> estiver em `H:\`, o npm tenta mexer na raiz do drive e o Windows bloqueia com
+> `EPERM`. O `npm start`, `npm test` e `node scripts/...` só funcionam de dentro
+> de `backend\`.
 
-Depois que este repositório for enviado ao GitHub:
+### Opção A — script único (recomendado)
+
+Um comando que clona, instala, testa e já cria o administrador:
 
 ```powershell
-cd H:\
-git clone <URL_DO_REPOSITORIO> MOTO-TAXI-RAPIDINHO
-cd H:\MOTO-TAXI-RAPIDINHO
+cd $env:USERPROFILE
+git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git repo-temp
+powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1
 ```
 
-### Opção B — a partir deste sandbox
+O script cuida de tudo e para com mensagem clara se algo faltar. Para escolher
+outra pasta ou outra senha:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1 `
+    -Destination "H:\MOTO-TAXI-RAPIDINHO" `
+    -AdminEmail "eu@exemplo.com" -AdminPassword "minha-senha-forte"
+```
+
+Ele confere a versão do Node (precisa ser 22+), a existência da unidade `H:`,
+recusa pasta não-vazia sem `.git` e roda os testes antes de terminar.
+
+### Opção B — manual, passo a passo
+
+```powershell
+# 1. Baixar o projeto (uma linha; o branch já traz módulos + DASHBOARD)
+cd H:\
+git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
+
+# 2. Entrar no backend (NAO fique em H:\)
+cd H:\MOTO-TAXI-RAPIDINHO\backend
+
+# 3. Instalar, testar, criar o admin e subir
+npm install
+npm test
+node scripts/create-admin.js --email admin@exemplo.com --password "senha-forte"
+npm start
+```
+
+Se a pasta `H:\MOTO-TAXI-RAPIDINHO` já existir e estiver **vazia**, clone dentro
+dela (o `.` no fim é essencial):
+
+```powershell
+cd H:\MOTO-TAXI-RAPIDINHO
+git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git .
+```
+
+> Sem o `git clone` a pasta fica vazia e nada funciona — `git fetch` responde
+> `fatal: not a git repository` e `npm start` reclama que não achou
+> `package.json`.
+
+### Opção C — a partir deste sandbox
 
 1. Baixe/exporte os arquivos deste repositório (por exemplo, um `.zip`).
 2. No Windows, rode:

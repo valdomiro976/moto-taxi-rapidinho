@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1c1c1e" />
+    <title>DASHBOARD · MOTO-TAXI RAPIDINHO</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <!-- Login do administrador -->
+    <section id="login-view" class="login-view hidden">
+      <form id="login-form" class="login-card">
+        <h1>DASHBOARD</h1>
+        <p class="muted">Painel administrativo · MOTO-TAXI RAPIDINHO</p>
+        <label>
+          E-mail
+          <input type="email" name="email" placeholder="admin@exemplo.com" required />
+        </label>
+        <label>
+          Senha
+          <input type="password" name="password" placeholder="sua senha" required />
+        </label>
+        <button type="submit">Entrar</button>
+        <p id="login-status" class="status" role="status"></p>
+      </form>
+    </section>
+
+    <!-- Painel -->
+    <div id="dashboard-view" class="layout hidden">
+      <aside class="sidebar">
+        <h1>DASH<wbr />BOARD</h1>
+        <nav>
+          <button type="button" class="nav-item active" data-view="overview">Visão geral</button>
+          <button type="button" class="nav-item" data-view="rides">Corridas</button>
+          <button type="button" class="nav-item" data-view="users">Usuários</button>
+        </nav>
+        <div class="sidebar-foot">
+          <span id="admin-name"></span>
+          <button type="button" id="logout" class="ghost">Sair</button>
+        </div>
+      </aside>
+
+      <main class="content">
+        <p id="global-status" class="status" role="status"></p>
+
+        <!-- Visão geral -->
+        <section id="view-overview" class="view">
+          <h2>Visão geral</h2>
+          <div class="cards">
+            <article class="metric">
+              <span class="metric-label">Corridas</span>
+              <strong id="metric-rides">–</strong>
+            </article>
+            <article class="metric">
+              <span class="metric-label">Usuários</span>
+              <strong id="metric-users">–</strong>
+            </article>
+            <article class="metric">
+              <span class="metric-label">Passageiros</span>
+              <strong id="metric-passengers">–</strong>
+            </article>
+            <article class="metric">
+              <span class="metric-label">Motoristas</span>
+              <strong id="metric-drivers">–</strong>
+            </article>
+            <article class="metric">
+              <span class="metric-label">Faturamento concluído</span>
+              <strong id="metric-revenue">–</strong>
+            </article>
+          </div>
+
+          <h3>Corridas por status</h3>
+          <ul id="status-breakdown" class="breakdown"></ul>
+        </section>
+
+        <!-- Corridas -->
+        <section id="view-rides" class="view hidden">
+          <h2>Corridas</h2>
+          <div class="toolbar">
+            <label>
+              Filtrar por status
+              <select id="rides-filter">
+                <option value="">Todos</option>
+                <option value="requested">Aguardando motoboy</option>
+                <option value="accepted">Aceita</option>
+                <option value="in_progress">Em andamento</option>
+                <option value="completed">Concluída</option>
+                <option value="canceled">Cancelada</option>
+              </select>
+            </label>
+            <button type="button" id="rides-refresh" class="secondary">Atualizar</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Status</th>
+                  <th>Passageiro</th>
+                  <th>Motorista</th>
+                  <th>Origem → Destino</th>
+                  <th class="num">Preço</th>
+                  <th>Criada em</th>
+                </tr>
+              </thead>
+              <tbody id="rides-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Usuários -->
+        <section id="view-users" class="view hidden">
+          <h2>Usuários</h2>
+          <div class="toolbar">
+            <label>
+              Filtrar por papel
+              <select id="users-filter">
+                <option value="">Todos</option>
+                <option value="passenger">Passageiros</option>
+                <option value="driver">Motoristas</option>
+                <option value="admin">Administradores</option>
+              </select>
+            </label>
+            <button type="button" id="users-refresh" class="secondary">Atualizar</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Telefone</th>
+                  <th>Papel</th>
+                  <th>Cadastro</th>
+                </tr>
+              </thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

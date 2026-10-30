@@ -11,7 +11,7 @@ Banco: SQLite (`backend/data/moto-taxi.sqlite`).
 | `email`      | TEXT     | obrigatório, único                            |
 | `phone`      | TEXT     | opcional                                      |
 | `password_hash` | TEXT  | `scrypt`, formato `salt:hash`                 |
-| `role`       | TEXT     | `passenger` ou `driver`                       |
+| `role`       | TEXT     | `passenger`, `driver` ou `admin`              |
 | `created_at` | TEXT     | ISO 8601 UTC                                  |
 
 ## `rides`

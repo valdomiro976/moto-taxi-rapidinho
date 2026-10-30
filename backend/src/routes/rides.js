@@ -30,6 +30,26 @@ function serialize(row) {
 
 router.use(requireAuth);
 
+// Fila de corridas pendentes: exclusiva do modulo Motorista.
+router.get('/available', requireRole('driver'), (req, res) => {
+  const db = req.app.locals.db;
+  const rows = db
+    .prepare("SELECT * FROM rides WHERE status = 'requested' ORDER BY id ASC")
+    .all();
+  res.json({ rides: rows.map(serialize) });
+});
+
+// Historico do proprio usuario: passageiro ve as corridas que pediu,
+// motoboy ve as corridas que aceitou.
+router.get('/mine', (req, res) => {
+  const db = req.app.locals.db;
+  const column = req.user.role === 'driver' ? 'driver_id' : 'passenger_id';
+  const rows = db
+    .prepare(`SELECT * FROM rides WHERE ${column} = ? ORDER BY id DESC`)
+    .all(req.user.id);
+  res.json({ rides: rows.map(serialize) });
+});
+
 router.get('/', (req, res) => {
   const db = req.app.locals.db;
   const status = req.query.status;
@@ -68,6 +88,10 @@ router.get('/:id', (req, res) => {
   return res.json({ ride: serialize(ride) });
 });
 
+// Quem pode cada transicao:
+//   accepted            -> apenas motoboy (assume a corrida)
+//   in_progress/completed -> apenas o motoboy dono
+//   canceled            -> passageiro dono ou motoboy dono
 router.patch('/:id/status', (req, res) => {
   const { status, driverId } = req.body || {};
   if (!STATUSES.includes(status)) {
@@ -78,6 +102,19 @@ router.patch('/:id/status', (req, res) => {
   const id = Number(req.params.id);
   const ride = db.prepare('SELECT * FROM rides WHERE id = ?').get(id);
   if (!ride) return res.status(404).json({ error: 'Corrida não encontrada' });
+
+  const isPassengerOwner = req.user.role === 'passenger' && ride.passenger_id === req.user.id;
+  const isDriverOwner = req.user.role === 'driver' && ride.driver_id === req.user.id;
+
+  if (status === 'accepted' && req.user.role !== 'driver') {
+    return res.status(403).json({ error: 'Apenas motoboys podem aceitar corridas' });
+  }
+  if ((status === 'in_progress' || status === 'completed') && !isDriverOwner) {
+    return res.status(403).json({ error: 'Apenas o motoboy da corrida pode fazer isso' });
+  }
+  if (status === 'canceled' && !isPassengerOwner && !isDriverOwner) {
+    return res.status(403).json({ error: 'Você não participa desta corrida' });
+  }
 
   if (!TRANSITIONS[ride.status].includes(status)) {
     return res

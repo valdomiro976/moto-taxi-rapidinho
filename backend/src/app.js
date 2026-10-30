@@ -1,9 +1,11 @@
 'use strict';
 
+const path = require('node:path');
 const express = require('express');
 const healthRoutes = require('./routes/health');
 const authRoutes = require('./routes/auth');
 const rideRoutes = require('./routes/rides');
+const adminRoutes = require('./routes/admin');
 const { openDatabase } = require('./db');
 
 /**
@@ -27,6 +29,16 @@ function createApp(options = {}) {
   app.use('/api', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/rides', rideRoutes);
+  app.use('/api/admin', adminRoutes);
+
+  // Painel administrativo (DASHBOARD), servido em /dashboard.
+  app.use(
+    '/dashboard',
+    express.static(path.join(__dirname, '..', '..', 'DASHBOARD')),
+  );
+
+  // Serve o PWA (passageiro e motorista) na mesma origem da API.
+  app.use(express.static(path.join(__dirname, '..', '..', 'frontend')));
 
   app.use((req, res) => res.status(404).json({ error: 'Rota não encontrada' }));
 

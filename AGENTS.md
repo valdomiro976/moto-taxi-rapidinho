@@ -32,15 +32,47 @@ npm run dev       # modo watch (node --watch)
 
 ```
 backend/src/
-├── app.js           # cria o app Express (sem escutar porta)
+├── app.js           # cria o app Express (sem escutar porta) + serve frontend e DASHBOARD
 ├── server.js        # sobe o servidor
 ├── db.js            # conexão e migrações do SQLite
-├── middleware/      # autenticação, erros
-└── routes/          # health, auth, rides
-frontend/            # PWA do passageiro/motoboy
+├── middleware/      # autenticação, papéis
+└── routes/          # health, auth, rides, admin
+backend/scripts/     # create-admin.js (concede o papel admin)
+frontend/
+├── index.html       # casca (login + área autenticada)
+├── styles.css
+└── js/
+    ├── api.js       # cliente HTTP + sessão
+    ├── ui.js        # formatação e cartões de corrida
+    ├── passenger.js # MÓDULO PASSAGEIRO
+    ├── driver.js    # MÓDULO MOTORISTA
+    └── shell.js     # login e troca de módulo
+DASHBOARD/           # painel administrativo (servido em /dashboard)
 docs/                # arquitetura e modelo de dados
 scripts/             # instalação no Windows e no Linux
 ```
+
+## Módulos e autorização
+
+Três papéis, definidos por `users.role`: `passenger`, `driver` e `admin`.
+
+Regras aplicadas **no backend** (o frontend só esconde botões):
+
+| Ação | Quem pode |
+|------|-----------|
+| `POST /api/rides` | `passenger` |
+| `GET /api/rides/available` | `driver` |
+| `PATCH .../status` → `accepted` | `driver` (assume a corrida) |
+| `PATCH .../status` → `in_progress`, `completed` | `driver` dono da corrida |
+| `PATCH .../status` → `canceled` | `passenger` dono ou `driver` dono |
+| `GET /api/admin/*` | `admin` |
+
+O papel `admin` **nunca** vem do autocadastro: `POST /api/auth/register` só aceita
+`passenger` ou `driver`. Admin é concedido apenas por `scripts/create-admin.js`,
+que escreve direto no banco.
+
+Ao adicionar um endpoint novo, decida explicitamente o papel com
+`requireRole(...)` ou verifique a posse do recurso. Nunca confie só na UI.
 
 ## Decisões
 
