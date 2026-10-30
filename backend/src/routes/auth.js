@@ -4,7 +4,8 @@ const express = require('express');
 const { hashPassword, verifyPassword, signToken } = require('../auth');
 
 const router = express.Router();
-const ROLES = ['passenger', 'driver'];
+// 'admin' nao pode ser escolhido no autocadastro: e criado via scripts/create-admin.js.
+const SELF_SIGNUP_ROLES = ['passenger', 'driver'];
 
 function publicUser(row) {
   return { id: row.id, name: row.name, email: row.email, phone: row.phone, role: row.role };
@@ -19,7 +20,7 @@ router.post('/register', (req, res) => {
   if (String(password).length < 6) {
     return res.status(400).json({ error: 'A senha deve ter ao menos 6 caracteres' });
   }
-  if (!ROLES.includes(role)) {
+  if (!SELF_SIGNUP_ROLES.includes(role)) {
     return res.status(400).json({ error: 'Papel inválido' });
   }
 

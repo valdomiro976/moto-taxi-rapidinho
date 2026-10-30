@@ -34,6 +34,13 @@
   `localStorage`); `ui.js` centraliza formatação.
 - Servido pelo próprio backend na raiz (`/`), evitando CORS.
 
+### Painel administrativo (`DASHBOARD/`)
+- HTML/CSS/JS puro, servido pelo backend em `/dashboard` (mesma origem da API).
+- `dashboard.js` cuida de login, navegação e tabelas; `js/api.js` guarda a sessão
+  do admin em `localStorage`.
+- Consome `/api/admin/stats`, `/api/admin/rides` e `/api/admin/users`.
+- Acesso restrito ao papel `admin`, validado no backend.
+
 ## Fluxo de uma corrida
 
 1. Passageiro cria a corrida (`POST /api/rides`) informando origem e destino.

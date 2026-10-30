@@ -79,3 +79,8 @@ Write-Host "  cd `"$Destination\backend`""
 Write-Host "  npm install"
 Write-Host "  npm test"
 Write-Host "  npm start"
+Write-Host ""
+Write-Host "Painel administrativo (DASHBOARD):" -ForegroundColor Yellow
+Write-Host "  # crie o primeiro admin (uma vez):"
+Write-Host "  node scripts/create-admin.js --email admin@exemplo.com --password `"senha-forte`""
+Write-Host "  # abra http://localhost:3000/dashboard"

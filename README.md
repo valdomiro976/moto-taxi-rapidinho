@@ -12,7 +12,8 @@ Plataforma de moto-táxi: passageiro pede corrida, motoboy aceita, acompanhament
 ```
 MOTO-TAXI-RAPIDINHO/
 ├── backend/          API REST (Node.js + Express + SQLite)
-│   └── src/routes/   health, auth, rides
+│   ├── src/routes/   health, auth, rides, admin
+│   └── scripts/      create-admin.js
 ├── frontend/         PWA com dois módulos
 │   ├── index.html    casca (login + área autenticada)
 │   ├── styles.css
@@ -22,6 +23,10 @@ MOTO-TAXI-RAPIDINHO/
 │       ├── passenger.js  MÓDULO PASSAGEIRO
 │       ├── driver.js     MÓDULO MOTORISTA
 │       └── shell.js      login e troca de módulo
+├── DASHBOARD/        Painel administrativo (servido em /dashboard)
+│   ├── index.html
+│   ├── css/dashboard.css
+│   └── js/{api.js,dashboard.js}
 ├── docs/             Documentação e modelo de dados
 ├── scripts/          Scripts de instalação (Windows / Linux)
 ├── .gitignore
@@ -78,6 +83,26 @@ Endpoints:
 | POST   | `/api/rides`             | passageiro  | Cria uma corrida                       |
 | GET    | `/api/rides/:id`         | autenticado | Detalhe da corrida                     |
 | PATCH  | `/api/rides/:id/status`  | por papel   | Atualiza o status (ver "Módulos")      |
+| GET    | `/api/admin/stats`       | admin       | Totais de usuários, corridas e receita |
+| GET    | `/api/admin/users`       | admin       | Lista usuários (`?role=`)              |
+| GET    | `/api/admin/rides`       | admin       | Lista corridas (`?status=`)            |
+
+## Painel administrativo (DASHBOARD)
+
+Painel web em `DASHBOARD/`, servido pelo backend em **`/dashboard`**. Mostra a
+visão geral (corridas, usuários e faturamento concluído), a lista de corridas
+com filtro por status e a lista de usuários com filtro por papel.
+
+O papel `admin` **não** pode ser escolhido no cadastro da API. Crie o primeiro
+administrador pelo script:
+
+```bash
+cd backend
+node scripts/create-admin.js --email admin@exemplo.com --password "senha-forte" --name "Seu Nome"
+```
+
+Depois abra `http://localhost:3000/dashboard` e entre com esse e-mail e senha.
+Rodar o script de novo com o mesmo e-mail apenas atualiza a senha.
 
 ## Como colocar em `H:\MOTO-TAXI-RAPIDINHO`
 
