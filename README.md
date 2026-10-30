@@ -108,13 +108,27 @@ Rodar o script de novo com o mesmo e-mail apenas atualiza a senha.
 
 ### Opção A — clonar do GitHub (recomendado)
 
-Depois que este repositório for enviado ao GitHub:
+O repositório é público, então não precisa de login:
 
 ```powershell
 cd H:\
-git clone <URL_DO_REPOSITORIO> MOTO-TAXI-RAPIDINHO
+git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
 cd H:\MOTO-TAXI-RAPIDINHO
+git checkout feature/modulos-passageiro-motorista   # traz módulos + DASHBOARD
 ```
+
+Se a pasta `H:\MOTO-TAXI-RAPIDINHO` já existir e estiver **vazia**, clone dentro
+dela em vez de usar o comando acima:
+
+```powershell
+cd H:\MOTO-TAXI-RAPIDINHO
+git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git .
+git checkout feature/modulos-passageiro-motorista
+```
+
+> Sem o `git clone` a pasta fica vazia e nada funciona — `git fetch` responde
+> `fatal: not a git repository` e `npm start` reclama que não achou
+> `package.json`.
 
 ### Opção B — a partir deste sandbox
 
