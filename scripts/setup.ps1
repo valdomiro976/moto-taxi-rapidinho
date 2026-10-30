@@ -26,9 +26,14 @@
 .PARAMETER SkipTests
     Pula a execucao dos testes.
 
+.PARAMETER Force
+    Se a pasta de destino existir com arquivos mas sem .git (copia incompleta),
+    apaga o conteudo dela e clona de novo. Sem esta opcao o script apenas recusa.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File .\setup.ps1
     powershell -ExecutionPolicy Bypass -File .\setup.ps1 -AdminEmail eu@exemplo.com -AdminPassword "minha-senha-forte"
+    powershell -ExecutionPolicy Bypass -File .\setup.ps1 -Force
 #>
 [CmdletBinding()]
 param(
@@ -37,7 +42,8 @@ param(
     [string]$Branch = "feature/modulos-passageiro-motorista",
     [string]$AdminEmail = "admin@exemplo.com",
     [string]$AdminPassword = "senha-forte",
-    [switch]$SkipTests
+    [switch]$SkipTests,
+    [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
@@ -98,9 +104,15 @@ if (Test-Path (Join-Path $Destination ".git")) {
     }
     $items = Get-ChildItem -Path $Destination -Force -ErrorAction SilentlyContinue
     if ($items) {
-        Fail "A pasta $Destination nao esta vazia e nao tem .git."
-        Write-Host "    Esvazie a pasta ou escolha outra com -Destination." -ForegroundColor Yellow
-        exit 1
+        if ($Force) {
+            Write-Host "    A pasta tem $($items.Count) item(ns) sem .git; limpando (-Force)" -ForegroundColor Yellow
+            Get-ChildItem -Path $Destination -Force | Remove-Item -Recurse -Force
+        } else {
+            Fail "A pasta $Destination nao esta vazia e nao tem .git."
+            Write-Host "    Rode de novo com -Force para apagar o conteudo e clonar:" -ForegroundColor Yellow
+            Write-Host "    .\setup.ps1 -Force" -ForegroundColor Yellow
+            exit 1
+        }
     }
     git clone --branch $Branch $Repo $Destination
     if ($LASTEXITCODE -ne 0) { Fail "Falha no git clone."; exit 1 }
