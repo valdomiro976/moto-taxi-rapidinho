@@ -15,7 +15,7 @@
     URL do repositorio.
 
 .PARAMETER Branch
-    Branch a usar. Padrao: feature/modulos-passageiro-motorista
+    Branch a usar. Padrao: main
 
 .PARAMETER AdminEmail
     E-mail do administrador. Padrao: admin@exemplo.com
@@ -39,7 +39,7 @@
 param(
     [string]$Destination = "H:\MOTO-TAXI-RAPIDINHO",
     [string]$Repo = "https://github.com/valdomiro976/moto-taxi-rapidinho.git",
-    [string]$Branch = "feature/modulos-passageiro-motorista",
+    [string]$Branch = "main",
     [string]$AdminEmail = "admin@exemplo.com",
     [string]$AdminPassword = "senha-forte",
     [switch]$SkipTests,

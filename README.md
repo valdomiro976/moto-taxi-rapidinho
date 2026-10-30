@@ -118,7 +118,7 @@ Um comando que clona, instala, testa e já cria o administrador:
 
 ```powershell
 cd $env:USERPROFILE
-git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git repo-temp
+git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git repo-temp
 powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1
 ```
 
@@ -134,12 +134,20 @@ powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1 `
 Ele confere a versão do Node (precisa ser 22+), a existência da unidade `H:`,
 recusa pasta não-vazia sem `.git` e roda os testes antes de terminar.
 
+Se a pasta `H:\MOTO-TAXI-RAPIDINHO` já existir com arquivos de uma tentativa
+anterior (sem `.git`), o `git clone` falha com *"destination path already
+exists and is not an empty directory"*. Nesse caso use `-Force`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1 -Force
+```
+
 ### Opção B — manual, passo a passo
 
 ```powershell
-# 1. Baixar o projeto (uma linha; o branch já traz módulos + DASHBOARD)
+# 1. Baixar o projeto
 cd H:\
-git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
+git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
 
 # 2. Entrar no backend (NAO fique em H:\)
 cd H:\MOTO-TAXI-RAPIDINHO\backend
@@ -156,7 +164,15 @@ dela (o `.` no fim é essencial):
 
 ```powershell
 cd H:\MOTO-TAXI-RAPIDINHO
-git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git .
+git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git .
+```
+
+Se ela tiver arquivos antigos, apague primeiro:
+
+```powershell
+cd H:\
+Remove-Item -Recurse -Force MOTO-TAXI-RAPIDINHO
+git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
 ```
 
 > Sem o `git clone` a pasta fica vazia e nada funciona — `git fetch` responde
