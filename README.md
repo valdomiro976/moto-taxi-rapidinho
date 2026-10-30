@@ -106,31 +106,64 @@ Rodar o script de novo com o mesmo e-mail apenas atualiza a senha.
 
 ## Como colocar em `H:\MOTO-TAXI-RAPIDINHO`
 
-### Opção A — clonar do GitHub (recomendado)
+> **Atenção:** rode os comandos **dentro da pasta do projeto**
+> (`H:\MOTO-TAXI-RAPIDINHO\backend`), nunca na raiz do disco (`H:\`). Se você
+> estiver em `H:\`, o npm tenta mexer na raiz do drive e o Windows bloqueia com
+> `EPERM`. O `npm start`, `npm test` e `node scripts/...` só funcionam de dentro
+> de `backend\`.
 
-O repositório é público, então não precisa de login:
+### Opção A — script único (recomendado)
+
+Um comando que clona, instala, testa e já cria o administrador:
 
 ```powershell
+cd $env:USERPROFILE
+git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git repo-temp
+powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1
+```
+
+O script cuida de tudo e para com mensagem clara se algo faltar. Para escolher
+outra pasta ou outra senha:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\repo-temp\scripts\setup.ps1 `
+    -Destination "H:\MOTO-TAXI-RAPIDINHO" `
+    -AdminEmail "eu@exemplo.com" -AdminPassword "minha-senha-forte"
+```
+
+Ele confere a versão do Node (precisa ser 22+), a existência da unidade `H:`,
+recusa pasta não-vazia sem `.git` e roda os testes antes de terminar.
+
+### Opção B — manual, passo a passo
+
+```powershell
+# 1. Baixar o projeto (uma linha; o branch já traz módulos + DASHBOARD)
 cd H:\
-git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
-cd H:\MOTO-TAXI-RAPIDINHO
-git checkout feature/modulos-passageiro-motorista   # traz módulos + DASHBOARD
+git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git MOTO-TAXI-RAPIDINHO
+
+# 2. Entrar no backend (NAO fique em H:\)
+cd H:\MOTO-TAXI-RAPIDINHO\backend
+
+# 3. Instalar, testar, criar o admin e subir
+npm install
+npm test
+node scripts/create-admin.js --email admin@exemplo.com --password "senha-forte"
+npm start
 ```
 
 Se a pasta `H:\MOTO-TAXI-RAPIDINHO` já existir e estiver **vazia**, clone dentro
-dela em vez de usar o comando acima:
+dela (o `.` no fim é essencial):
 
 ```powershell
 cd H:\MOTO-TAXI-RAPIDINHO
-git clone https://github.com/valdomiro976/moto-taxi-rapidinho.git .
-git checkout feature/modulos-passageiro-motorista
+git clone --branch feature/modulos-passageiro-motorista https://github.com/valdomiro976/moto-taxi-rapidinho.git .
 ```
 
 > Sem o `git clone` a pasta fica vazia e nada funciona — `git fetch` responde
 > `fatal: not a git repository` e `npm start` reclama que não achou
 > `package.json`.
 
-### Opção B — a partir deste sandbox
+### Opção C — a partir deste sandbox
 
 1. Baixe/exporte os arquivos deste repositório (por exemplo, um `.zip`).
 2. No Windows, rode:
