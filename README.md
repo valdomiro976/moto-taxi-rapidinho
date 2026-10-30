@@ -12,13 +12,40 @@ Plataforma de moto-táxi: passageiro pede corrida, motoboy aceita, acompanhament
 ```
 MOTO-TAXI-RAPIDINHO/
 ├── backend/          API REST (Node.js + Express + SQLite)
-├── frontend/         Aplicação web (PWA) do passageiro e do motoboy
+│   └── src/routes/   health, auth, rides
+├── frontend/         PWA com dois módulos
+│   ├── index.html    casca (login + área autenticada)
+│   ├── styles.css
+│   └── js/
+│       ├── api.js        cliente da API + sessão
+│       ├── ui.js         formatação (dinheiro, status, cartões)
+│       ├── passenger.js  MÓDULO PASSAGEIRO
+│       ├── driver.js     MÓDULO MOTORISTA
+│       └── shell.js      login e troca de módulo
 ├── docs/             Documentação e modelo de dados
 ├── scripts/          Scripts de instalação (Windows / Linux)
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
+
+## Módulos
+
+O sistema tem **dois módulos**, escolhidos pelo papel (`role`) do usuário no
+cadastro:
+
+| Módulo | Papel | O que faz |
+|--------|-------|-----------|
+| **Passageiro** | `passenger` | Pede corrida, acompanha o status e cancela |
+| **Motorista** | `driver` | Vê a fila de corridas pendentes, aceita, inicia e conclui |
+
+O backend reforça as regras — não é só a tela que esconde botões:
+
+- `POST /api/rides` → apenas `passenger`
+- `GET /api/rides/available` → apenas `driver`
+- `PATCH /api/rides/:id/status` com `accepted` → apenas `driver`
+- `in_progress` / `completed` → apenas o `driver` dono da corrida
+- `canceled` → o `passenger` dono ou o `driver` dono
 
 ## Requisitos
 
@@ -31,20 +58,26 @@ MOTO-TAXI-RAPIDINHO/
 cd backend
 npm install
 npm test          # roda os testes automatizados
-npm start         # sobe a API em http://localhost:3000
+npm start         # sobe a API + o PWA em http://localhost:3000
 ```
 
-Endpoints iniciais:
+O backend serve o frontend na mesma origem, então basta abrir
+`http://localhost:3000` — não é preciso rodar um segundo servidor nem lidar
+com CORS.
 
-| Método | Rota                     | Descrição                              |
-|--------|--------------------------|----------------------------------------|
-| GET    | `/api/health`            | Verificação de saúde                   |
-| POST   | `/api/auth/register`     | Cadastro de passageiro                 |
-| POST   | `/api/auth/login`        | Login (retorna token JWT)              |
-| GET    | `/api/rides`             | Lista corridas                         |
-| POST   | `/api/rides`             | Cria uma corrida                       |
-| GET    | `/api/rides/:id`         | Detalhe da corrida                     |
-| PATCH  | `/api/rides/:id/status`  | Atualiza o status da corrida           |
+Endpoints:
+
+| Método | Rota                     | Papel       | Descrição                              |
+|--------|--------------------------|-------------|----------------------------------------|
+| GET    | `/api/health`            | público     | Verificação de saúde                   |
+| POST   | `/api/auth/register`     | público     | Cadastro (passageiro ou motorista)     |
+| POST   | `/api/auth/login`        | público     | Login (retorna token JWT)              |
+| GET    | `/api/rides`             | autenticado | Lista corridas                         |
+| GET    | `/api/rides/available`   | motorista   | Fila de corridas pendentes             |
+| GET    | `/api/rides/mine`        | autenticado | Corridas do próprio usuário            |
+| POST   | `/api/rides`             | passageiro  | Cria uma corrida                       |
+| GET    | `/api/rides/:id`         | autenticado | Detalhe da corrida                     |
+| PATCH  | `/api/rides/:id/status`  | por papel   | Atualiza o status (ver "Módulos")      |
 
 ## Como colocar em `H:\MOTO-TAXI-RAPIDINHO`
 

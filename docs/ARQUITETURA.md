@@ -27,8 +27,12 @@
 
 ### Frontend (`frontend/`)
 - PWA em HTML/CSS/JS puro, sem build obrigatório.
-- Telas: login/cadastro, pedido de corrida, acompanhamento.
-- Consome a API em `http://localhost:3000/api` (configurável).
+- **Dois módulos** carregados dinamicamente conforme `user.role`:
+  - `passenger.js` — pedir corrida, acompanhar, cancelar.
+  - `driver.js` — fila de pendentes, aceitar, iniciar, concluir.
+- `shell.js` faz o login e monta o módulo; `api.js` guarda a sessão (JWT em
+  `localStorage`); `ui.js` centraliza formatação.
+- Servido pelo próprio backend na raiz (`/`), evitando CORS.
 
 ## Fluxo de uma corrida
 
