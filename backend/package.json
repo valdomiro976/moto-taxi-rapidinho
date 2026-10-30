@@ -1,0 +1,19 @@
+{
+  "name": "moto-taxi-rapidinho-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API do MOTO-TAXI RAPIDINHO",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

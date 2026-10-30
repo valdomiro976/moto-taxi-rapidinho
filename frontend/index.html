@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5a623" />
+    <title>MOTO-TAXI RAPIDINHO</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>MOTO&#8209;TAXI <span>RAPIDINHO</span></h1>
+      <p class="tagline">Sua corrida de moto, rapidinho.</p>
+    </header>
+
+    <main>
+      <section id="auth" class="card">
+        <h2>Acesso</h2>
+        <form id="auth-form" autocomplete="on">
+          <label>
+            Nome
+            <input type="text" name="name" placeholder="Seu nome" />
+          </label>
+          <label>
+            E-mail
+            <input type="email" name="email" placeholder="voce@email.com" required />
+          </label>
+          <label>
+            Senha
+            <input type="password" name="password" placeholder="mínimo 6 caracteres" required />
+          </label>
+          <label>
+            Perfil
+            <select name="role">
+              <option value="passenger">Passageiro</option>
+              <option value="driver">Motoboy</option>
+            </select>
+          </label>
+          <div class="actions">
+            <button type="submit" data-action="login">Entrar</button>
+            <button type="button" data-action="register" class="secondary">Cadastrar</button>
+          </div>
+        </form>
+        <p id="auth-status" class="status" role="status"></p>
+      </section>
+
+      <section id="app-area" class="card hidden">
+        <h2>Olá, <span id="user-name"></span></h2>
+
+        <form id="ride-form">
+          <label>
+            Origem
+            <input type="text" name="origin" placeholder="Rua de partida" required />
+          </label>
+          <label>
+            Destino
+            <input type="text" name="destination" placeholder="Para onde vamos?" required />
+          </label>
+          <label>
+            Preço estimado (R$)
+            <input type="number" name="price" min="0" step="0.01" value="10.00" />
+          </label>
+          <div class="actions">
+            <button type="submit">Pedir corrida</button>
+            <button type="button" id="refresh" class="secondary">Atualizar lista</button>
+            <button type="button" id="logout" class="ghost">Sair</button>
+          </div>
+        </form>
+
+        <h3>Corridas</h3>
+        <ul id="ride-list" class="ride-list"></ul>
+      </section>
+    </main>
+
+    <footer>
+      <small>MOTO-TAXI RAPIDINHO &middot; protótipo</small>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

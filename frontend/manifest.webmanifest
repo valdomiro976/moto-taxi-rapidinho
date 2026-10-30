@@ -1,0 +1,11 @@
+{
+  "name": "MOTO-TAXI RAPIDINHO",
+  "short_name": "Rapidinho",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1c1c1e",
+  "theme_color": "#f5a623",
+  "lang": "pt-BR",
+  "description": "Peça sua corrida de moto, rapidinho.",
+  "icons": []
+}
