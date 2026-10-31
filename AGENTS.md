@@ -89,3 +89,66 @@ Ao adicionar um endpoint novo, decida explicitamente o papel com
   para compilar.
 - Autenticação com JWT; senhas com `scrypt`.
 - `app.js` é separado de `server.js` para permitir testes sem abrir porta.
+
+## Publicação no Google Play (apps Android)
+
+Os apps Android **não ficam neste repositório**. Eles vivem na máquina do
+desenvolvedor, em `H:\MOTO-TAXI-RAPIDINHO\`:
+
+| Pasta | App | Pacote |
+|-------|-----|--------|
+| `1_android-motorista` | Motorista | `com.taxirapidinho.motorista` |
+| `1_android-passageiro_FINAL_PIX_OK` | Passageiro | `com.taxirapidinho.passageiro` |
+
+Este repositório é só o **backend + frontend web (PWA)**.
+
+### Requisitos atuais da loja
+
+- `targetSdkVersion 36` (Android 16) — obrigatório desde 31/08/2026 para novos
+  envios e atualizações.
+- `minSdkVersion 24` — exigido pela Proteção Automática do Google Play.
+- `versionCode` **sempre crescente**; o Play rejeita número já usado, inclusive
+  de envios que ainda estão em análise.
+
+### Assinatura
+
+Cada app tem seu próprio keystore em `app/jks/`, e o **alias e a senha ficam em
+`app/build.gradle`** (texto puro — mover para `keystore.properties` fora do git).
+O keystore correto é o que casa com o *certificado de upload* do Play Console:
+
+| App | Arquivo | Alias | SHA1 (upload) |
+|-----|---------|-------|---------------|
+| Motorista | `key_app_motorista.jks` | `key_motorista` | `30:FC:26:EF:0A:69:9E:40:3A:AD:DE:AA:45:13:B7:40:E1:CA:D0:37` |
+| Passageiro | `key_taxi.jks` | `key_taxi` | `FA:C2:32:7D:C8:11:BA:9C:69:84:64:4A:F3:52:C0:C1:86:7B:0B:77` |
+
+Ambos são **PKCS12**. O `keytool` do Java 8 responde `Invalid keystore format`
+ou `parseAlgParameters failed` nesses arquivos — usar o do JDK 18
+(`%JAVA_HOME%\bin\keytool.exe`), que é o mesmo que o `gradlew` usa.
+
+Ao enviar, confirme **na página do app certo** no Play Console (comparar o nome
+do pacote, não o nome exibido): enviar o AAB do motorista na página do passageiro
+gera o erro "precisa ter o nome de pacote com.taxirapidinho.passageiro".
+
+### Documentos legais
+
+O site oficial (`taxirapidinho.com.br`) está fora do ar desde 2026 (DNS aponta
+para um Traefik com certificado autoassinado, todas as rotas em 404). Por isso as
+páginas exigidas pelo Play são publicadas via **GitHub Pages**, a partir de
+`docs/`:
+
+```
+https://valdomiro976.github.io/moto-taxi-rapidinho/privacy/
+https://valdomiro976.github.io/moto-taxi-rapidinho/termos/
+https://valdomiro976.github.io/moto-taxi-rapidinho/exclusao-de-conta/
+https://valdomiro976.github.io/moto-taxi-rapidinho/motorista/privacy/   (etc.)
+```
+
+O Pages é servido da branch `main`, pasta `/docs`. O `docs/` já continha a
+documentação de arquitetura, então as páginas HTML convivem com ela.
+
+### Conta de desenvolvedor
+
+A política de contas inativas exige **as duas** condições: verificar e-mail e
+telefone em *Conta de desenvolvedor → Detalhes da conta* **e** publicar um app ou
+atualização. Publicar em teste interno também conta. A conta pode voltar a ficar
+inativa depois.
