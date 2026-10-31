@@ -57,6 +57,34 @@
 ## Evolução planejada
 
 - WebSocket para posição do motoboy em tempo real.
-- Mapa (Leaflet + OpenStreetMap) e cálculo de distância/rota.
+- Mapa e cálculo de distância/rota. **Decisão: Google Maps Platform**
+  (ver "Decisão sobre mapas" abaixo).
 - Pagamento via Pix.
 - Notificações push.
+
+## Decisão sobre mapas
+
+**Google Maps Platform**, mantido nos apps Android. A alternativa considerada era
+OpenStreetMap (Leaflet no web, osmdroid no Android), e foi descartada.
+
+Motivos da recusa do OSM:
+
+- `tile.openstreetmap.org` **proíbe uso pesado** e não oferece SLA — pode bloquear
+  o app sem aviso. Um app de transporte é justamente o perfil de uso pesado.
+- A política do OSM também **proíbe uso offline e pré-carregamento de tiles**.
+- Servidores públicos de demonstração (OSRM, Nominatim) **não podem** ser usados
+  em produção.
+- Trocar o cálculo de distância mudaria o **valor da corrida** — risco de negócio.
+
+Ponto de custo que costuma motivar a migração e não se aplica aqui: o SKU
+**Maps SDK** (a exibição do mapa no Android) é **ilimitado e gratuito**. Apenas
+as APIs de serviço são cobradas, com 10.000 chamadas grátis por mês cada:
+Geocoding, Compute Routes, Places.
+
+A conta de faturamento do Google Cloud é de titularidade do contratante, que
+acompanha o consumo. Se o faturamento falhar, as APIs são desativadas e o app
+perde as funcionalidades que dependem delas.
+
+Se um dia a migração voltar à mesa, os provedores derivados do OSM indicados
+pela própria fundação OSM para uso comercial são MapTiler, Stadia Maps,
+LocationIQ, Geoapify e Thunderforest — ou hospedar tiles, OSRM e Nominatim.

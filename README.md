@@ -211,7 +211,8 @@ O script cria a pasta, copia os arquivos e roda `git init` + commit inicial.
 ## Próximos passos sugeridos
 
 1. Definir identidade visual e nome do app.
-2. Integrar mapa (Leaflet/OpenStreetMap) e cálculo de rota.
+2. Integrar mapa e cálculo de rota — **Google Maps Platform** (decisão
+   registrada em `docs/ARQUITETURA.md`).
 3. Fluxo de aceite da corrida pelo motoboy e status em tempo real (WebSocket).
 4. Pagamentos (Pix) e avaliação mútua.
 5. Publicar backend e frontend.
